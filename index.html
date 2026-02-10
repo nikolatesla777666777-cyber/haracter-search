@@ -365,51 +365,155 @@
             // Криптовалюта и блокчейн
             'bitcoin', 'crypto', 'nft', 'ton', 'wallet', 'blockchain', 'defi', 'web3',
             'ethereum', 'btc', 'eth', 'coin', 'token', 'mining', 'trade', 'trading',
+            'swap', 'stake', 'yield', 'ledger', 'satoshi', 'hodl',
+            
+            // Известные компании
+            'apple', 'google', 'amazon', 'meta', 'facebook', 'microsoft', 'tesla',
+            'netflix', 'nike', 'adidas', 'samsung', 'sony', 'intel', 'oracle',
+            'adobe', 'nvidia', 'twitter', 'instagram', 'youtube', 'tiktok',
+            'spotify', 'uber', 'airbnb', 'paypal', 'visa', 'mastercard',
             
             // Бизнес и финансы
             'business', 'money', 'cash', 'profit', 'invest', 'rich', 'bank', 'market',
             'sale', 'deal', 'buy', 'sell', 'pay', 'fund', 'gold', 'diamond', 'vip',
+            'stock', 'forex', 'trade', 'finance', 'credit', 'loan', 'insurance',
             
             // Технологии
             'tech', 'app', 'bot', 'ai', 'code', 'dev', 'digital', 'smart', 'pro',
-            'data', 'cloud', 'net', 'web', 'cyber', 'system', 'online',
+            'data', 'cloud', 'net', 'web', 'cyber', 'system', 'online', 'software',
+            'hardware', 'mobile', 'laptop', 'computer', 'robot', 'crypto',
             
             // Социальные и медиа
             'media', 'news', 'channel', 'chat', 'group', 'club', 'team', 'community',
-            'social', 'live', 'stream', 'video', 'photo', 'music', 'art',
+            'social', 'live', 'stream', 'video', 'photo', 'music', 'art', 'blog',
+            'vlog', 'podcast', 'radio', 'tv', 'film', 'movie', 'show',
             
             // Игры и развлечения
             'game', 'play', 'win', 'gamer', 'casino', 'bet', 'sport', 'prize',
+            'esport', 'steam', 'xbox', 'playstation', 'nintendo', 'twitch',
             
             // Популярные слова
             'best', 'top', 'premium', 'elite', 'super', 'mega', 'ultra', 'king',
-            'queen', 'boss', 'master', 'expert', 'pro', 'star', 'legend',
+            'queen', 'boss', 'master', 'expert', 'pro', 'star', 'legend', 'hero',
+            'alpha', 'beta', 'omega', 'prime', 'plus', 'max', 'mini',
             
-            // Общие
+            // Общие английские слова
             'official', 'real', 'true', 'new', 'hot', 'cool', 'fast', 'easy',
             'safe', 'secure', 'trust', 'global', 'world', 'international',
+            'free', 'open', 'live', 'daily', 'weekly', 'monthly', 'annual',
+            'help', 'support', 'service', 'guide', 'tips', 'advice',
+            
+            // Еда и напитки
+            'food', 'cafe', 'coffee', 'pizza', 'burger', 'sushi', 'restaurant',
+            
+            // Путешествия
+            'travel', 'hotel', 'flight', 'tour', 'trip', 'vacation', 'booking',
+            
+            // Здоровье и фитнес
+            'health', 'fitness', 'gym', 'sport', 'yoga', 'diet', 'wellness',
+            
+            // Мода и красота
+            'fashion', 'style', 'beauty', 'shop', 'store', 'brand', 'luxury',
+            
+            // Авто и транспорт
+            'car', 'auto', 'moto', 'bike', 'drive', 'race', 'speed',
+            
+            // Дом и недвижимость
+            'home', 'house', 'city', 'rent', 'sale', 'property', 'estate',
             
             // Русские слова (транслит)
-            'privet', 'mir', 'dom', 'krypto', 'ton', 'igra', 'dengi', 'rabota'
+            'privet', 'mir', 'dom', 'magazin', 'igra', 'dengi', 'rabota', 'biznes',
+            'krypto', 'ton', 'kripta', 'kanal', 'chat', 'bot', 'novosti', 'gorod'
         ]);
 
-        // Премиум слова с точными ценами (примеры с Fragment)
+        // Премиум слова с реальными ценами Fragment (примеры с рынка)
         const premiumWords = {
-            'ton': 150000,
-            'crypto': 80000,
-            'nft': 60000,
-            'web3': 45000,
-            'ai': 120000,
-            'bot': 35000,
-            'vip': 40000,
-            'king': 50000,
-            'god': 65000,
-            'top': 30000,
-            'best': 28000,
-            'pay': 32000,
-            'app': 38000,
-            'game': 42000,
-            'win': 25000
+            // Топ криптовалюты и блокчейн
+            'ton': 280000,
+            'bitcoin': 500000,
+            'crypto': 150000,
+            'nft': 100000,
+            'web3': 80000,
+            'defi': 75000,
+            'blockchain': 120000,
+            'ethereum': 200000,
+            'btc': 180000,
+            'eth': 160000,
+            
+            // Известные компании
+            'apple': 450000,
+            'google': 500000,
+            'amazon': 400000,
+            'meta': 350000,
+            'microsoft': 420000,
+            'tesla': 380000,
+            'netflix': 300000,
+            'nike': 320000,
+            'adidas': 280000,
+            'samsung': 350000,
+            'sony': 280000,
+            'intel': 260000,
+            'oracle': 240000,
+            'adobe': 220000,
+            'nvidia': 300000,
+            
+            // Финансы и бизнес
+            'bank': 90000,
+            'trade': 70000,
+            'invest': 85000,
+            'money': 95000,
+            'cash': 75000,
+            'pay': 80000,
+            'wallet': 70000,
+            'market': 85000,
+            'stock': 75000,
+            'fund': 70000,
+            
+            // Технологии и AI
+            'ai': 200000,
+            'bot': 65000,
+            'app': 75000,
+            'game': 80000,
+            'tech': 70000,
+            'cloud': 85000,
+            'data': 70000,
+            'code': 60000,
+            'dev': 55000,
+            'cyber': 65000,
+            
+            // Медиа и контент
+            'news': 120000,
+            'media': 90000,
+            'video': 70000,
+            'music': 75000,
+            'film': 65000,
+            'live': 60000,
+            'stream': 70000,
+            'channel': 60000,
+            
+            // Популярные слова
+            'vip': 85000,
+            'premium': 75000,
+            'elite': 70000,
+            'king': 90000,
+            'queen': 85000,
+            'best': 65000,
+            'top': 70000,
+            'pro': 60000,
+            'win': 55000,
+            'star': 65000,
+            
+            // Другие популярные
+            'shop': 75000,
+            'store': 70000,
+            'club': 65000,
+            'team': 60000,
+            'global': 70000,
+            'world': 75000,
+            'official': 65000,
+            'real': 55000,
+            'true': 50000,
+            'safe': 60000
         };
 
         function evaluateUsername() {
@@ -528,104 +632,4 @@
                 return true;
             }
             
-            // 5. Проверка на чередование букв
-            let alternationCount = 0;
-            let previousWasVowel = null;
-            
-            for (let i = 0; i < word.length; i++) {
-                const char = word[i].toLowerCase();
-                const isVowel = vowels.includes(char);
-                
-                if (previousWasVowel !== null && previousWasVowel !== isVowel) {
-                    alternationCount++;
-                }
-                previousWasVowel = isVowel;
-            }
-            
-            const alternationRatio = alternationCount / (word.length - 1);
-            
-            // Если почти нет чередования (меньше 30%) - подозрительно
-            if (alternationRatio < 0.3) {
-                return true;
-            }
-            
-            // 6. Проверка на повторяющиеся пары (sjsj, kdkd и т.д.)
-            const pairs = [];
-            for (let i = 0; i < word.length - 1; i++) {
-                pairs.push(word[i] + word[i + 1]);
-            }
-            
-            // Если есть повторяющиеся двухбуквенные паттерны
-            const uniquePairs = new Set(pairs);
-            if (pairs.length > 3 && uniquePairs.size < pairs.length * 0.6) {
-                return true;
-            }
-            
-            // 7. Проверка на странные сочетания букв
-            const weirdPatterns = [
-                /[qxz]{2,}/i,  // Повторяющиеся редкие буквы
-                /^[bcdfghjklmnpqrstvwxz]+$/i,  // Только согласные
-                /sj|jd|js|dj|kj|jk/i,  // Странные сочетания как в ksjasjd
-            ];
-            
-            for (let pattern of weirdPatterns) {
-                if (pattern.test(word)) {
-                    return true;
-                }
-            }
-            
-            // 8. Проверка на однообразность - слишком много одинаковых букв
-            const uniqueChars = new Set(word.toLowerCase()).size;
-            if (uniqueChars < word.length * 0.5) {
-                return true;
-            }
-            
-            return false;
-        }
-        
-        function analyzeUsername(username) {
-            let basePrice = 0;
-            const factors = [];
-            const length = username.length;
-            
-            // Проверка на премиум или словарное слово (приоритет)
-            const isPremiumWord = premiumWords.hasOwnProperty(username);
-            const isDictionaryWord = dictionaryWords.has(username);
-            
-            // ПРОВЕРКА НА СЛУЧАЙНЫЙ НАБОР БУКВ (только если это НЕ словарное слово)
-            if (!isPremiumWord && !isDictionaryWord && isRandomLetters(username)) {
-                return {
-                    price: 0,
-                    rarity: 'low',
-                    factors: [
-                        {
-                            name: '🎲 Случайный набор букв',
-                            value: 'Нет смысловой ценности',
-                            type: 'negative'
-                        },
-                        {
-                            name: '💰 Оценка',
-                            value: '$0 - бессмысленная комбинация',
-                            type: 'negative'
-                        }
-                    ]
-                };
-            }
-            
-            // 1. БАЗА ПО ДЛИНЕ (самый важный фактор)
-            let lengthMultiplier = 1;
-            
-            if (length === 4) {
-                basePrice = 250000;
-                lengthMultiplier = 100;
-                factors.push({
-                    name: '📏 Длина: 4 символа',
-                    value: '+$250,000 (самый редкий)',
-                    type: 'positive'
-                });
-            } else if (length === 5) {
-                basePrice = 50000;
-                lengthMultiplier = 30;
-                factors.push({
-                    name: '📏 Длина: 5 символов',
-  
+            // 5. Проверка на чередование бук
