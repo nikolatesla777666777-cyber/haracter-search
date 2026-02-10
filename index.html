@@ -1,1 +1,659 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Оценка рыночной стоимости Telegram username на Fragment. Узнайте цену своего никнейма.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+    <title>Haracter Search - Оценка стоимости Telegram Username</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(58, 71, 213, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 210, 255, 0.06) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-5%, -5%) rotate(5deg); }
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: 3.8em;
+            background: linear-gradient(135deg, #00d2ff 0%, #3a47d5 50%, #ff00ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00d2ff, transparent);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 1.15em;
+            margin-top: 20px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .fragment-badge {
+            display: inline-block;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 15px;
+            color: #00d2ff;
+            font-weight: 600;
+        }
+
+        .search-section {
+            background: rgba(26, 26, 46, 0.85);
+            border: 2px solid #2a2a4e;
+            border-radius: 24px;
+            padding: 45px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            margin-bottom: 40px;
+            backdrop-filter: blur(20px);
+            animation: fadeInUp 0.8s ease 0.2s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d2ff, transparent);
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 20px 28px;
+            font-size: 1.25em;
+            background: #0f0f1e;
+            border: 2px solid #3a3a5e;
+            border-radius: 14px;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #00d2ff;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.4), inset 0 0 20px rgba(0, 210, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        input[type="text"]::placeholder {
+            color: #555;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        button {
+            padding: 20px 45px;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #00d2ff 0%, #3a47d5 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn-label {
+            position: relative;
+            z-index: 1;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 210, 255, 0.5);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            background: rgba(255, 68, 68, 0.15);
+            border: 2px solid rgba(255, 68, 68, 0.4);
+            border-radius: 12px;
+            padding: 18px 25px;
+            color: #ff6b6b;
+            display: none;
+            margin-top: 20px;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .result-section {
+            background: rgba(26, 26, 46, 0.85);
+            border: 2px solid #2a2a4e;
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            display: none;
+            backdrop-filter: blur(20px);
+            animation: fadeIn 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .price-display {
+            text-align: center;
+            margin: 35px 0;
+            position: relative;
+        }
+
+        .username-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 2.2em;
+            color: #00d2ff;
+            margin-bottom: 25px;
+            word-break: break-word;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .price-amount {
+            font-family: 'Space Mono', monospace;
+            font-size: 4.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00ff88 0%, #00d2ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+            line-height: 1.2;
+            animation: priceGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes priceGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3)); }
+            50% { filter: drop-shadow(0 0 25px rgba(0, 255, 136, 0.6)); }
+        }
+
+        .price-label {
+            color: #888;
+            font-size: 1.2em;
+            margin-top: 15px;
+            font-weight: 300;
+        }
+
+        .rarity-badge {
+            display: inline-block;
+            padding: 14px 35px;
+            border-radius: 30px;
+            font-size: 1.5em;
+            font-weight: 800;
+            margin: 25px 0;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            animation: badgePop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-family: 'Space Mono', monospace;
+        }
+
+        @keyframes badgePop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .rarity-legendary {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.7), 0 0 80px rgba(255, 215, 0, 0.3);
+        }
+
+        .rarity-premium {
+            background: linear-gradient(135deg, #00ff88 0%, #00d2ff 100%);
+            color: #000;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.7), 0 0 80px rgba(0, 210, 255, 0.3);
+        }
+
+        .rarity-cool {
+            background: linear-gradient(135deg, #3a47d5 0%, #8b5cf6 100%);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(58, 71, 213, 0.5);
+        }
+
+        .rarity-good {
+            background: linear-gradient(135deg, #666 0%, #999 100%);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(102, 102, 102, 0.4);
+        }
+
+        .rarity-normal {
+            background: linear-gradient(135deg, #444 0%, #666 100%);
+            color: #ddd;
+            box-shadow: 0 0 15px rgba(68, 68, 68, 0.3);
+        }
+
+        .rarity-low {
+            background: linear-gradient(135deg, #333 0%, #444 100%);
+            color: #888;
+            box-shadow: 0 0 10px rgba(51, 51, 51, 0.2);
+        }
+
+        .analysis {
+            background: #0f0f1e;
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 35px;
+            border: 1px solid rgba(0, 210, 255, 0.1);
+        }
+
+        .analysis h3 {
+            color: #00d2ff;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .factor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            margin: 12px 0;
+            background: rgba(42, 42, 78, 0.5);
+            border-radius: 10px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease;
+            animation-fill-mode: both;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .factor:hover {
+            background: rgba(42, 42, 78, 0.7);
+            transform: translateX(5px);
+        }
+
+        .factor.positive {
+            border-left-color: #00ff88;
+        }
+
+        .factor.negative {
+            border-left-color: #ff4444;
+        }
+
+        .factor.neutral {
+            border-left-color: #ffaa00;
+        }
+
+        .factor.warning {
+            border-left-color: #ff6b00;
+            background: rgba(255, 107, 0, 0.1);
+        }
+
+        .factor-name {
+            font-weight: 600;
+            color: #e0e0e0;
+            font-size: 1.05em;
+        }
+
+        .factor-value {
+            color: #999;
+            text-align: right;
+            font-size: 0.95em;
+        }
+
+        .fragment-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .fragment-link a {
+            display: inline-block;
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 12px 30px;
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 1.05em;
+        }
+
+        .fragment-link a:hover {
+            background: rgba(0, 210, 255, 0.1);
+            border-color: #00d2ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.3);
+        }
+
+        .ton-info {
+            background: rgba(0, 210, 255, 0.05);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 0.95em;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9em;
+            padding: 30px 0;
+        }
+
+        footer a {
+            color: #00d2ff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #3a47d5;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .search-section, .result-section {
+                padding: 30px 25px;
+            }
+
+            .price-amount {
+                font-size: 3em;
+            }
+
+            .factor {
+                flex-direction: column;
+                text-align: left;
+                gap: 8px;
+            }
+
+            .factor-value {
+                text-align: left;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Haracter Search</h1>
+            <p class="subtitle">Профессиональная оценка стоимости Telegram Username</p>
+            <div class="fragment-badge">Основано на реальных данных Fragment 2024-2025</div>
+        </header>
+
+        <div class="search-section">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="usernameInput" 
+                    placeholder="Введите username (только латиница)"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button id="evaluateBtn">
+                    <span class="btn-label">Оценить</span>
+                </button>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="price-display">
+                <div class="username-display" id="displayUsername">@username</div>
+                <div class="rarity-badge" id="rarityBadge">ПРЕМИУМ</div>
+                <div class="price-amount" id="priceAmount">$0</div>
+                <div class="price-label">Примерная рыночная стоимость на Fragment</div>
+                <div class="ton-info" id="tonInfo">≈ 0 TON (курс $5.72)</div>
+            </div>
+
+            <div class="analysis">
+                <h3>📊 Детальный анализ</h3>
+                <div id="factorsContainer"></div>
+            </div>
+
+            <div class="fragment-link">
+                <a href="https://fragment.com" target="_blank" rel="noopener noreferrer">
+                    🔗 Открыть Fragment.com
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Данные основаны на анализе рынка Fragment • Курс TON: $5.72</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">
+                Оценка является приблизительной и может отличаться от реальной рыночной стоимости
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        const TON_PRICE = 5.72;
+
+        // ══════════════════════════════════════════════════
+        //  БАЗА ИЗВЕСТНЫХ СЛОВ — глобальные бренды / имена
+        // ══════════════════════════════════════════════════
+        const premiumWords = {
+            // 🌟 MEGA ($500k+)
+            'news': 1000000, 'sex': 900000, 'porn': 850000,
+
+            // 💎 Глобальные бренды ($100k–500k)
+            'google': 500000, 'apple': 450000, 'amazon': 400000,
+            'microsoft': 380000, 'tesla': 350000, 'samsung': 320000,
+            'tiktok': 300000, 'instagram': 280000, 'youtube': 260000,
+            'twitter': 240000, 'netflix': 220000, 'facebook': 210000,
+            'telegram': 200000, 'uber': 190000, 'nike': 185000,
+            'adidas': 180000, 'gucci': 175000, 'chanel': 170000,
+            'prada': 165000, 'ferrari': 160000, 'lamborghini': 155000,
+            'rolex': 150000, 'disney': 145000, 'marvel': 140000,
+            'mcdonalds': 135000, 'burgerking': 130000, 'burger': 125000,
+            'starbucks': 120000, 'pepsi': 115000, 'cocacola': 110000,
+            'visa': 105000, 'mastercard': 100000,
+
+            // ✝️ Культурные / религиозные иконы
+            'jesus': 300000, 'allah': 290000, 'god': 280000,
+            'bible': 200000, 'islam': 190000, 'church': 180000,
+
+            // 💰 Крипто / финансы
+            'bitcoin': 250000, 'crypto': 200000, 'ethereum': 180000,
+            'bank': 120000, 'finance': 95000,
+
+            // 🎵 Поп-культура / игры / персонажи
+            'kiki': 180000, 'mars': 160000, 'frozen': 140000,
+            'elsa': 130000, 'barbie': 125000, 'pokemon': 120000,
+            'minecraft': 115000, 'roblox': 110000, 'fortnite': 105000,
+            'superman': 100000, 'batman': 95000, 'spiderman': 90000,
+            'sonic': 85000, 'mario': 80000, 'zelda': 75000,
+
+            // ⭐ Общие премиум-слова
+            'casino': 100000, 'auto': 95000, 'pavel': 85000,
+ 
