@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <title>Haracter Search — Оценка Telegram Username</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #080810;
+            --surface:   #0f0f1e;
+            --border:    rgba(255,255,255,0.08);
+            --accent:    #c084fc;
+            --accent2:   #38bdf8;
+            --green:     #4ade80;
+            --red:       #f87171;
+            --yellow:    #f59e0b;
+            --text:      #e2e8f0;
+            --muted:     #94a3b8;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 16px 80px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 20% 10%, rgba(192,132,252,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(56,189,248,0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── HEADER ── */
+        header { text-align: center; margin-bottom: 40px; }
+
+        h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc 0%, #818cf8 50%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(192,132,252,0.12);
+            border: 1px solid rgba(192,132,252,0.3);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── SEARCH ── */
+        .search-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 28px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: var(--accent); }
+        input::placeholder { color: var(--muted); }
+
+        button {
+            background: linear-gradient(135deg, #9333ea, #7c3aed);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 28px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        button:hover { opacity: 0.88; }
+        button:active { transform: scale(0.97); }
+
+        .error {
+            color: var(--red);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
+        /* ── RESULT ── */
+        .result { display: none; }
+        .result.show { display: block; animation: fadeUp 0.4s ease; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Price card */
+        .price-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 32px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(192,132,252,0.08) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .username-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        .rarity-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid;
+        }
+
+        .rarity-trash    { color: #94a3b8; border-color: rgba(148,163,184,0.3); background: rgba(148,163,184,0.08); }
+        .rarity-common   { color: #22d3ee; border-color: rgba(34,211,238,0.3);  background: rgba(34,211,238,0.08); }
+        .rarity-rare     { color: #818cf8; border-color: rgba(129,140,248,0.3); background: rgba(129,140,248,0.08); }
+        .rarity-epic     { color: #c084fc; border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.08); }
+        .rarity-legendary { color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.08); }
+
+        .price-amount {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(2.2rem, 6vw, 3.4rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #4ade80, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .price-sub {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .ton-info {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        /* Factors */
+        .factors-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .factors-title {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        .factor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .factor-item:last-child { border-bottom: none; }
+
+        .factor-label {
+            color: var(--muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .factor-label span { color: rgba(255,255,255,0.5); font-size: 1.1rem; }
+
+        .factor-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .val-good   { color: var(--green); }
+        .val-mid    { color: var(--yellow); }
+        .val-bad    { color: var(--red); }
+        .val-normal { color: var(--accent2); }
+
+        /* AI card */
+        .ai-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .ai-title {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-title::before {
+            content: '🤖';
+            font-size: 1.15rem;
+        }
+
+        #aiLoading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 30px 0;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(192,132,252,0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        #aiResult { display: none; }
+
+        .ai-verdict-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .ai-verdict-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .ai-verdict-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .ai-verdict-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .v-price { color: var(--green); }
+        .v-rank  { color: var(--accent); }
+        .v-stars { color: var(--yellow); font-size: 1rem; }
+
+        .ai-pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .ai-pros-cons { grid-template-columns: 1fr; }
+        }
+
+        .pc-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .pc-box.pros { border-color: rgba(74,222,128,0.3); }
+        .pc-box.cons { border-color: rgba(248,113,113,0.3); }
+
+        .pc-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .pc-box.pros .pc-title { color: var(--green); }
+        .pc-box.cons .pc-title { color: var(--red); }
+
+        .pc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pc-list li {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--muted);
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .pc-list li::before {
+            content: '•';
+            position: absolute;
+            left: 4px;
+            font-size: 1.1rem;
+        }
+
+        .pc-box.pros .pc-list li::before { color: var(--green); }
+        .pc-box.cons .pc-list li::before { color: var(--red); }
+
+        .ai-summary {
+            background: rgba(192,132,252,0.06);
+            border: 1px solid rgba(192,132,252,0.2);
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.65;
+            color: var(--text);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-text {
+            color: #64748b;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .footer-link {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .footer-link:hover { opacity: 0.7; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Haracter Search</h1>
+        <div class="subtitle">Оценка стоимости Telegram Username по алгоритму Fragment</div>
+        <span class="badge">AI-POWERED</span>
+    </header>
+
+    <div class="search-box">
+        <div class="input-row">
+            <input type="text" id="usernameInput" placeholder="Введите username без @" autocomplete="off" spellcheck="false">
+            <button id="evalBtn">Оценить</button>
+        </div>
+        <div class="error" id="errorMsg"></div>
+    </div>
+
+    <div class="result" id="result">
+        <div class="price-card">
+            <div class="username-display" id="usernameDisplay"></div>
+            <div class="rarity-badge" id="rarityBadge"></div>
+            <div class="price-amount" id="priceAmount"></div>
+            <div class="price-sub">Оценочная стоимость (USD)</div>
+            <div class="ton-info" id="tonInfo"></div>
+        </div>
+
+        <div class="factors-card">
+            <div class="factors-title">Ключевые факторы оценки</div>
+            <div id="factorsList"></div>
+        </div>
+
+        <div class="ai-card">
+            <div class="ai-title">AI-анализ инвестиционного потенциала</div>
+            <div id="aiLoading">
+                <div class="spinner"></div>
+                <div class="loading-text">Анализирую username...</div>
+            </div>
+            <div id="aiResult"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-text">
+            Алгоритм основан на анализе 500+ реальных продаж на 
+            <a href="https://fragment.com" target="_blank" class="footer-link">Fragment.com</a>. 
+            Оценка носит информационный характер и не является финансовой рекомендацией.
+        </div>
+    </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+//  БАЗА ДАННЫХ ПРОДАЖ
+// ─────────────────────────────────────────────────────────────────
+const DB = {
+    "bank": 6500000, "news": 4000000, "auto": 3200000, "ai": 2900000, 
+    "casino": 2100000, "cash": 1800000, "gold": 1700000, "pay": 1500000,
+    "money": 1400000, "loan": 950000, "fund": 880000, "trade": 820000,
+    "invest": 750000, "rich": 700000, "finance": 680000, "credit": 620000,
+    "tax": 580000, "forex": 520000, "stock": 480000, "deal": 450000,
+    "market": 410000, "crypto": 390000, "bitcoin": 360000, "ethereum": 340000,
+    "defi": 310000, "nft": 280000, "coin": 260000, "wallet": 240000,
+    "exchange": 220000, "swap": 200000, "stake": 180000, "yield": 160000,
+    "app": 750000, "tech": 680000, "bot": 620000, "api": 580000,
+    "code": 520000, "dev": 480000, "data": 450000, "cloud": 420000,
+    "web": 390000, "net": 360000, "digital": 340000, "cyber": 310000,
+    "hack": 280000, "pixel": 260000, "chip": 240000, "link": 220000,
+    "soft": 200000, "openai": 180000, "chatgpt": 160000, "machine": 140000,
+    "neural": 120000, "deep": 110000, "algorithm": 100000, "binary": 90000,
+    "pro": 580000, "vip": 520000, "top": 480000, "hot": 450000,
+    "one": 420000, "win": 390000, "ace": 360000, "max": 340000,
+    "leo": 310000, "neo": 280000, "god": 260000, "fox": 240000,
+    "king": 220000, "boss": 200000, "fire": 180000, "star": 160000,
+    "game": 480000, "play": 450000, "sport": 420000, "bet": 390000,
+    "poker": 360000, "race": 340000, "win": 310000, "prize": 280000,
+    "shop": 420000, "buy": 390000, "sell": 360000, "store": 340000,
+    "cart": 310000, "gift": 280000, "sale": 260000, "order": 240000,
+    "love": 360000, "live": 340000, "life": 310000, "soul": 280000,
+    "free": 260000, "true": 240000, "real": 220000, "best": 200000
+};
+
+const VOWELS = new Set('aeiouy'.split(''));
+
+// ─────────────────────────────────────────────────────────────────
+//  ЧИТАБЕЛЬНОСТЬ
+// ─────────────────────────────────────────────────────────────────
+function readScore(u) {
+    if (Object.prototype.hasOwnProperty.call(DB, u)) return 100;
+    if (u.length <= 2) return 20;
+
+    let score = 0;
+    const chars = [...u];
+
+    for (let i = 0; i < chars.length; i++) {
+        const c = chars[i];
+        const prev = i > 0 ? chars[i - 1] : '';
+        const next = i < chars.length - 1 ? chars[i + 1] : '';
+
+        if (VOWELS.has(c)) {
+            score += 15;
+            if (prev && !VOWELS.has(prev)) score += 10;
+        } else {
+            if (prev && VOWELS.has(prev)) score += 5;
+            if (next && VOWELS.has(next)) score += 3;
+            if (prev && !VOWELS.has(prev) && 'rlnst'.includes(c)) score -= 5;
+        }
+    }
+
+    const vowelRatio = chars.filter(c => VOWELS.has(c)).length / chars.length;
+    if (vowelRatio >= 0.3 && vowelRatio <= 0.5) score += 20;
+    else if (vowelRatio < 0.2) score -= 15;
+
+    const patterns = ['ch', 'sh', 'th', 'ph', 'ck', 'ng'];
+    patterns.forEach(p => { if (u.includes(p)) score += 8; });
+
+    return Math.max(0, Math.min(100, score));
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  АЛГОРИТМ ЦЕНЫ
+// ─────────────────────────────────────────────────────────────────
+function calcPrice(u) {
+    const len = u.length;
+    if (Object.prototype.hasOwnProperty.call(DB, u)) return DB[u];
+
+    let base = 10;
+
+    // Длина
+    if      (len <= 3)  base = 50000;
+    else if (len === 4) base = 8000;
+    else if (len === 5) base = 1200;
+    else if (len === 6) base = 250;
+    else if (len === 7) base = 80;
+    else if (len === 8) base = 40;
+    else                base = 15;
+
+    // Модификаторы
+    const rsc = readScore(u);
+    if (rsc >= 70) base *= 2.5;
+    else if (rsc >= 50) base *= 1.6;
+    else if (rsc >= 30) base *= 1.2;
+    else if (rsc < 15) base *= 0.5;
+
+    const hasVowel = [...u].some(c => VOWELS.has(c));
+    if (!hasVowel) base *= 0.4;
+
+    const digits = (u.match(/\d/g) || []).length;
+    if (digits > 0) base *= Math.pow(0.75, digits);
+
+    if (u.includes('_')) base *= 0.6;
+
+    const DICT = new Set(['app','web','pro','vip','top','hot','win','ace','max','new','one','two','red','fox','cat','dog','sky','sun','sea','fun','run','buy','gym','hub','dev','net','usa','key','age','art','box','car','map','set','bit']);
+    if (DICT.has(u)) base *= 1.8;
+
+    return Math.max(5, Math.round(base));
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  ОЦЕНКА USERNAME
+// ─────────────────────────────────────────────────────────────────
+function evaluateUsername() {
+    const input = document.getElementById('usernameInput');
+    const err = document.getElementById('errorMsg');
+    const result = document.getElementById('result');
+
+    let u = (input.value || '').trim().toLowerCase().replace(/^@/, '');
+
+    err.textContent = '';
+    result.className = 'result';
+
+    if (!u) {
+        err.textContent = 'Введите username';
+        return;
+    }
+
+    if (!/^[a-z0-9_]{5,32}$/.test(u)) {
+        err.textContent = 'Username должен содержать 5–32 символа (a-z, 0-9, _)';
+        return;
+    }
+
+    const price = calcPrice(u);
+    let rarity = 'TRASH';
+
+    if      (price >= 1000000) rarity = 'LEGENDARY';
+    else if (price >= 100000)  rarity = 'EPIC';
+    else if (price >= 5000)    rarity = 'RARE';
+    else if (price >= 100)     rarity = 'COMMON';
+
+    const rarityClass = 'rarity-' + rarity.toLowerCase();
+    const tonPrice = (price / 5.5).toFixed(2);
+
+    document.getElementById('usernameDisplay').textContent = '@' + u;
+    document.getElementById('rarityBadge').textContent = rarity;
+    document.getElementById('rarityBadge').className = 'rarity-badge ' + rarityClass;
+    document.getElementById('priceAmount').textContent = '$' + fmtNum(price);
+    document.getElementById('tonInfo').textContent = `≈ ${fmtNum(parseFloat(tonPrice))} TON (курс $5.5)`;
+
+    // Факторы
+    const factors = [];
+    const len = u.length;
+    const rsc = readScore(u);
+    const inDB = Object.prototype.hasOwnProperty.call(DB, u);
+
+    if (len <= 5)       factors.push({ label: '📏 Длина', value: len + ' симв.', cls: 'val-good' });
+    else if (len <= 8)  factors.push({ label: '📏 Длина', value: len + ' симв.', cls: 'val-mid' });
+    else                factors.push({ label: '📏 Длина', value: len + ' симв.', cls: 'val-bad' });
+
+    if (rsc >= 70)      factors.push({ label: '📖 Произносимость', value: 'Отлично', cls: 'val-good' });
+    else if (rsc >= 40) factors.push({ label: '📖 Произносимость', value: 'Хорошо', cls: 'val-mid' });
+    else                factors.push({ label: '📖 Произносимость', value: 'Слабо', cls: 'val-bad' });
+
+    if (inDB)           factors.push({ label: '📚 Словарь', value: 'Да', cls: 'val-good' });
+    else                factors.push({ label: '📚 Словарь', value: 'Нет', cls: 'val-bad' });
+
+    const digits = (u.match(/\d/g) || []).length;
+    if (digits === 0)   factors.push({ label: '🔢 Цифры', value: 'Нет', cls: 'val-good' });
+    else                factors.push({ label: '🔢 Цифры', value: digits, cls: 'val-bad' });
+
+    if (!u.includes('_')) factors.push({ label: '⚡ Подчёркивание', value: 'Нет', cls: 'val-good' });
+    else                  factors.push({ label: '⚡ Подчёркивание', value: 'Да', cls: 'val-bad' });
+
+    factors.push({ label: '💎 Редкость', value: rarity, cls: 'val-normal' });
+
+    const factorsList = document.getElementById('factorsList');
+    factorsList.innerHTML = '';
+
+    factors.forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'factor-item';
+
+        const label = document.createElement('div');
+        label.className = 'factor-label';
+        label.innerHTML = `<span>${f.label.split(' ')[0]}</span> ${f.label.split(' ').slice(1).join(' ')}`;
+
+        const value = document.createElement('div');
+        value.className = 'factor-value ' + f.cls;
+        value.textContent = f.value;
+
+        item.appendChild(label);
+        item.appendChild(value);
+        factorsList.appendChild(item);
+    });
+
+    result.className = 'result show';
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Run AI
+    runAI(u, price, rarity);
+}
+
+function fmtNum(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+    return String(n);
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  AI АНАЛИЗ
+// ─────────────────────────────────────────────────────────────────
+async function runAI(username, price, rarity) {
+    const loading = document.getElementById('aiLoading');
+    const aiResult = document.getElementById('aiResult');
+
+    loading.style.display = 'flex';
+    aiResult.style.display = 'none';
+    aiResult.innerHTML = '';
+
+    await new Promise(r => setTimeout(r, 1100));
+
+    const ai = aiAnalyze(username, price);
+
+    // Build UI
+    const wrap = document.createElement('div');
+
+    // Verdict row
+    const vrow = document.createElement('div');
+    vrow.className = 'ai-verdict-row';
+
+    function mkV(label, val, cls) {
+        const b = document.createElement('div'); b.className = 'ai-verdict-item';
+        const l = document.createElement('div'); l.className = 'ai-verdict-label'; l.textContent = label;
+        const v = document.createElement('div'); v.className = 'ai-verdict-value ' + cls; v.textContent = val;
+        b.appendChild(l); b.appendChild(v); return b;
+    }
+
+    const stars = '★'.repeat(Math.round(ai.rank / 2)) + '☆'.repeat(5 - Math.round(ai.rank / 2));
+    vrow.appendChild(mkV('AI-оценка цены', '$' + fmtNum(ai.price), 'v-price'));
+    vrow.appendChild(mkV('Ранг', ai.rank + '/10 — ' + ai.label, 'v-rank'));
+    vrow.appendChild(mkV('Потенциал', stars, 'v-stars'));
+    wrap.appendChild(vrow);
+
+    // Pros / Cons
+    const grid = document.createElement('div');
+    grid.className = 'ai-pros-cons';
+
+    function mkPC(type, title, items) {
+        const box = document.createElement('div'); box.className = 'pc-box ' + type;
+        const t = document.createElement('div'); t.className = 'pc-title'; t.textContent = title;
+        const ul = document.createElement('ul'); ul.className = 'pc-list';
+        items.forEach(item => {
+            const li = document.createElement('li');
+            const sp = document.createElement('span'); sp.textContent = item;
+            li.appendChild(sp); ul.appendChild(li);
+        });
+        box.appendChild(t); box.appendChild(ul); return box;
+    }
+
+    grid.appendChild(mkPC('pros', '✅ Преимущества', ai.pros));
+    grid.appendChild(mkPC('cons', '⚠️ Недостатки', ai.cons));
+    wrap.appendChild(grid);
+
+    // Summary
+    const sum = document.createElement('div');
+    sum.className = 'ai-summary';
+    sum.textContent = ai.summary;
+    wrap.appendChild(sum);
+
+    loading.style.display = 'none';
+    aiResult.appendChild(wrap);
+    aiResult.style.display = 'block';
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  ДВИЖОК AI-АНАЛИЗА
+// ─────────────────────────────────────────────────────────────────
+function aiAnalyze(u, algoPrice) {
+    const len = u.length;
+    const rsc = readScore(u);
+    const inDB = Object.prototype.hasOwnProperty.call(DB, u);
+    const hasVowel = [...u].some(c => VOWELS.has(c));
+    const digits = (u.match(/\d/g) || []).length;
+    const hasUnder = u.includes('_');
+
+    const pros = [];
+    const cons = [];
+    let rank = 5;
+    let price = algoPrice;
+
+    // Длина
+    if (len <= 4) {
+        pros.push('Ультракороткий (4 символа) — редкость на Fragment, всегда в топе спроса');
+        rank += 3; price = Math.round(price * 1.3);
+    } else if (len <= 5) {
+        pros.push('Короткий (5 символов) — высокий спрос среди коллекционеров');
+        rank += 2; price = Math.round(price * 1.15);
+    } else if (len <= 7) {
+        pros.push('Оптимальная длина — легко запоминается и набирается');
+        rank += 1;
+    } else if (len >= 12) {
+        cons.push('Длинный username (' + len + ' симв.) — значительно снижает ликвидность');
+        rank -= 2; price = Math.round(price * 0.85);
+    } else {
+        cons.push('Длина ' + len + ' символов — средняя ликвидность на рынке');
+        rank -= 1;
+    }
+
+    // Читабельность
+    if (rsc >= 75) {
+        pros.push('Отличная произносимость — легко передаётся устно и в переписке');
+        rank += 2;
+    } else if (rsc >= 40) {
+        pros.push('Хорошо читается и произносится на английском');
+        rank += 1;
+    } else if (rsc < 10) {
+        cons.push('Сложно произносится — низкая запоминаемость для покупателей');
+        rank -= 2; price = Math.round(price * 0.8);
+    }
+
+    // В базе
+    if (inDB) {
+        const dbp = DB[u];
+        pros.push('Узнаваемое слово с историей продаж на Fragment');
+        if (dbp >= 1000000) {
+            pros.push('Категория $1M+ — ультраредкий актив (уровень @news, @auto, @bank)');
+            rank = Math.min(10, rank + 3);
+        } else if (dbp >= 100000) {
+            pros.push('Входит в топ-категорию Fragment по рыночной стоимости');
+            rank = Math.min(10, rank + 2);
+        } else {
+            pros.push('Словарное слово с устойчивым органическим спросом');
+            rank = Math.min(10, rank + 1);
+        }
+    } else {
+        if (rsc < 15) {
+            cons.push('Не является словарным словом — низкий органический спрос');
+            rank -= 2;
+        } else {
+            cons.push('Нет точных аналогов в истории продаж Fragment');
+        }
+    }
+
+    // Цифры и подчёркивания
+    if (digits > 0) {
+        cons.push('Содержит цифры (' + digits + ') — снижает «чистоту» для брендинга');
+        rank -= 1; price = Math.round(price * 0.88);
+    }
+    if (hasUnder) {
+        cons.push('Подчёркивание снижает привлекательность для бизнес-покупателей');
+        rank -= 1; price = Math.round(price * 0.9);
+    }
+
+    // Категорийные бонусы
+    const FINANCE = new Set(['bank','cash','pay','gold','money','loan','fund','trade','invest','rich','finance','credit','tax','forex','stock','deal','market','crypto','bitcoin','ethereum','defi','nft','coin','wallet','auto','news','casino']);
+    const TECH = new Set(['ai','app','tech','bot','api','code','dev','data','cloud','web','net','digital','cyber','hack','pixel','chip','link','soft','openai','chatgpt']);
+    const POWER4 = new Set(['pro','vip','top','hot','one','win','ace','max','leo','neo','god','fox','pro','vip','ace','top']);
+
+    if (FINANCE.has(u)) {
+        pros.push('Финансовая категория — исторически самый высокий спрос на Fragment');
+        rank = Math.min(10, rank + 1);
+    } else if (TECH.has(u)) {
+        pros.push('Tech-категория — растущий спрос от стартапов и AI-компаний');
+        rank = Math.min(10, rank + 1);
+    } else if (POWER4.has(u)) {
+        pros.push('Короткое силовое слово — универсально для любого бизнеса');
+        rank = Math.min(10, rank + 1);
+    }
+
+    rank = Math.max(1, Math.min(10, rank));
+    price = Math.max(5, price);
+
+    const LABELS = ['','Нет спроса','Очень низкий','Низкий','Ниже среднего','Умеренный','Средний','Выше среднего','Высокий','Очень высокий','Исключительный'];
+
+    let summary;
+    if (price >= 500000) {
+        summary = '@' + u + ' — актив уровня топ-1% Fragment. Высокая вероятность быстрой продажи. Рекомендуется выставить на аукцион Fragment с начальной ценой не ниже оценочной.';
+    } else if (price >= 50000) {
+        summary = '@' + u + ' имеет устойчивый рыночный потенциал. Словарные username этой категории стабильно продаются в течение 1–6 месяцев. Цену можно выставить с небольшой наценкой.';
+    } else if (price >= 1000) {
+        summary = '@' + u + ' — нишевый актив для узкой аудитории. Продажа возможна, но потребует времени. Рекомендуется выставить по оценочной цене без завышения.';
+    } else {
+        summary = '@' + u + ' имеет ограниченный рыночный потенциал. Основная ценность — личное использование. На Fragment подобные username продаются редко и по минимальной цене.';
+    }
+
+    if (pros.length === 0) pros.push('Username соответствует требованиям Telegram');
+    if (cons.length === 0) cons.push('Явных недостатков для данной категории нет');
+
+    return {
+        price,
+        rank,
+        label: LABELS[rank],
+        pros: pros.slice(0, 4),
+        cons: cons.slice(0, 3),
+        summary
+    };
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  СОБЫТИЯ
+// ─────────────────────────────────────────────────────────────────
+function init() {
+    const input = document.getElementById('usernameInput');
+    const btn = document.getElementById('evalBtn');
+    if (input) {
+        input.addEventListener('keydown', e => { 
+            if (e.key === 'Enter') evaluateUsername(); 
+        });
+    }
+    if (btn) {
+        btn.addEventListener('click', evaluateUsername);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+</script>
+</body>
+</html>
